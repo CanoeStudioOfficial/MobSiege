@@ -89,7 +89,7 @@ public class SiegeProps
     }
 
     public static <T extends ConfigProperty> T addConfig(T cfg, ConfigCategory cat) {
-        ALL_CFGS.add(cfg);
+        ALL_CFGS.add(cfg.setCategory(cat));
         return cfg;
     }
 

@@ -75,6 +75,7 @@ public class SiegeJsonConfig
 
     public void resetToDefault() {
         clear();
+        org.canoestudios.mobsiege.config.props.SiegeProps.resetAllConfigs();
     }
 
     @SuppressWarnings("unchecked")
