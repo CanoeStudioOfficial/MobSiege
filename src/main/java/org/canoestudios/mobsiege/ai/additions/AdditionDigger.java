@@ -2,6 +2,7 @@ package org.canoestudios.mobsiege.ai.additions;
 
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
@@ -24,8 +25,18 @@ public class AdditionDigger implements ITaskAddition
 
     @Override
     public EntityAIBase getAdditionalAI(EntityLiving entityLiving) {
-        if (!entityLiving.world.isRemote && entityLiving.getRNG().nextInt(20) == 0) {
-            entityLiving.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(Items.IRON_PICKAXE));
+        if (!entityLiving.world.isRemote) {
+            ItemStack mainHand = entityLiving.getHeldItemMainhand();
+            boolean needsTool = SiegeProps.DIG_TOOLS.get(entityLiving);
+            if (needsTool && mainHand.isEmpty()) {
+                if (entityLiving instanceof EntityZombie) {
+                    if (entityLiving.getRNG().nextFloat() < 0.25f) {
+                        entityLiving.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(Items.IRON_PICKAXE));
+                    }
+                } else if (entityLiving.getRNG().nextInt(20) == 0) {
+                    entityLiving.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(Items.IRON_PICKAXE));
+                }
+            }
         }
         return new SiegeAIDigging(entityLiving);
     }
