@@ -12,6 +12,8 @@ import java.util.function.Function;
 
 public class ConfigProperty<T>
 {
+    private static final ConfigCategory DEFAULT_ROOT = new ConfigCategory(null);
+
     private final String key;
     private ConfigCategory cat;
     private final Function<JsonObject, T> funcGet;
@@ -39,6 +41,10 @@ public class ConfigProperty<T>
         return key;
     }
 
+    private ConfigCategory getEffectiveCategory() {
+        return cat != null ? cat : DEFAULT_ROOT;
+    }
+
     public T get(@Nonnull Entity entity) {
         net.minecraftforge.fml.common.registry.EntityEntry ee = EntityRegistry.getEntry(entity.getClass());
         return ee == null || ee.getRegistryName() == null ? def : get(ee.getRegistryName(), "dim_" + entity.world.provider.getDimension());
@@ -50,7 +56,7 @@ public class ConfigProperty<T>
     }
 
     public T get(@Nullable ResourceLocation idName, @Nullable String dim) {
-        JsonObject conf = cat.findProperty(idName, dim, key);
+        JsonObject conf = getEffectiveCategory().findProperty(idName, dim, key);
         return conf == null ? def : funcGet.apply(conf);
     }
 
@@ -67,7 +73,7 @@ public class ConfigProperty<T>
     }
 
     public void set(@Nullable ResourceLocation idName, @Nullable String dim, T value) {
-        JsonObject conf = cat.getOrCreate(idName, dim);
+        JsonObject conf = getEffectiveCategory().getOrCreate(idName, dim);
         if (conf != null) {
             funcSet.accept(conf, value);
         }
